@@ -88,9 +88,120 @@ static bool checkdere(int pre_index)
   return false;
 }
 //TODO:check_parantheses
-static bool checkparantheses()
+static bool checkparantheses(int p, int q)
 {
+  int left_p_n = 0;
+  int right_p_n = 0;
+  if(tokens[p].type!='('||tokens[q].type!=')')
+  {
+    return false;//when there is no parantheses,return it
+  }
+  p++;
+  for(int i=p; i<q;i++)
+  {
+   if(tokens[i].type=='(')
+     left_p_n++;
+   if(tokens[i].type==')')
+     right_p_n++;
+   if(right_p_n>left_p_n)
+     return false;//match failure
+  }
+  if(right_p_n!=left_p_n)
+    return false;
+  return true;//shows that the parantheses matched
+}
+static int find_dominant_operator(int p, int q)
+{
+ //TODO
+  int op = p;
+  int quote_match = 0;
+  for(int i=p;i<q;i++)
+  {
+    if(tokens[i].type == '(')
+      quote_match++;  
+    else if(tokens[i].type ==')')
+    {
+      quote_match--;
+    }
+    else if(quote_match == 0)
+    {
+      if(tokens[i].type==EQ || tokens[i].type==NEQ)
+      {
+        return i;
+      }
+     if(tokens[i].type == DER)
+        continue;
+     else if(tokens[i].type == ADD || tokens[i].type == SUB ||tokens[i].type == MUL || tokens[i].type == DIV)
+     {
+       if(tokens[i].type == ADD || tokens[i].type == SUB)
+       {
+       if(tokens[i-1].type==SUB)
+        { return false;
+        }
+       op=i;
+       }
+       else{
+       if(tokens[op].type== ADD || tokens[op].type== SUB);
+       else op=i;
 
+      }
+     } 
+    }
+  }
+  return op;
+}
+static int eval(int p, int q)//TODO:to calculate the exper vals
+{
+  if(p>q)
+  {
+    return false;
+  }
+  else if(p==q)
+  {
+    int number=0;
+    if(tokens[p].type == HEX_NUM)
+      sscanf(tokens[p].str,"%x",&number);
+    else if(tokens[p].type == DEC_NUM)
+      sscanf(tokens[p].str,"%d", &number);
+    else if(tokens[p].type == REG_NAME)
+    {
+      for(int i=0;i<4;i++)
+        tokens[p].str[i] = tokens[p].str[i+1];//
+      if(strcmp(tokens[p].str,"eip")==0)
+        number = cpu.eip;
+      else{
+      for(int i=0;i<8;i++)
+      {  if(strcmp(tokens[p].str, regsl[i])==0)
+        {
+          number = cpu.gpr[i]._32;
+          break;
+        }  
+      }
+     }
+   }
+     return number; 
+  }
+  else 
+  {
+    int op = find_dominant_operator(p,q);
+    //TODO 
+    int l_eval = eval(p,op-1);
+    int r_eval = eval(op+1,q);
+    if(checkparantheses(p,q))//TODO:
+    {
+      return eval(p+1,q-1);
+    }
+    int op_type = tokens[op].type;
+    if(op_type==EQ) return l_eval==r_eval;
+    else if(op_type==NEQ) return l_eval!=r_eval;
+    else if(op_type==ADD) return l_eval+r_eval;
+    else if(op_type==SUB) return l_eval-r_eval;
+    else if(op_type==MUL) return l_eval*r_eval;
+    else if(op_type==DIV) return l_eval/r_eval;
+    
+    
+  }
+return 0;
 }
 static bool make_token(char *e) {
   int position = 0;
@@ -184,6 +295,6 @@ uint32_t expr(char *e, bool *success) {
   /* TODO: Insert codes to evaluate the expression. */
   /* TODO: finish this after check_parenthese */
  // TODO();
-
-  return 0;
+  int p=0, q=nr_token-1;
+  return eval(p,q);
 }
