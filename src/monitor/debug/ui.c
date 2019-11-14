@@ -85,7 +85,7 @@ static int cmd_p(char *args)
   if(!success)
     printf("match rules fails!\n");
   else
-    printf("%#x\n", result);//TODO:after finishing expr,this cmd will print the expr values
+    printf("%#x\n", result);//%#x :0x(result in hex)
   return 0;
 }
 static struct {

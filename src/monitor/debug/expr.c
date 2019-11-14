@@ -11,7 +11,6 @@ enum {
   DIV = '/', HEX_NUM = 16 , NEQ = 11 ,EQ = 1, OP = '(',CP = ')',
   REG_NAME = 255, NEG =2,DER = 3
 
-  /* TODO: Add more token types */
 
 };
 
@@ -20,7 +19,7 @@ static struct rule {
   int token_type;
 } rules[] = {
 
-  /* TODO: Add more rules.
+  /* Add more rules.
    * Pay attention to the precedence level of different rules.
    */
 
@@ -28,9 +27,9 @@ static struct rule {
   {"\\+", ADD},         // plus
   {"-",SUB},		//sub
   {"\\*",MUL},		//mul or indicator
-  {"/", DIV},		//div
-  {"[0-9]+",DEC_NUM},		//decimal
+  {"/", DIV},		//div	//decimal
   {"0[xX][0-9a-fA-F]+",HEX_NUM},
+  {"[0-9]+",DEC_NUM},
   {"!=",NEQ},		//notequal
   {"==", EQ},         // equal
   {"\\(",OP},
@@ -198,7 +197,7 @@ static int eval(int p, int q)//TODO:to calculate the exper vals
     else if(op_type==SUB) return l_eval-r_eval;
     else if(op_type==MUL) return l_eval*r_eval;
     else if(op_type==DIV) return l_eval/r_eval;
-    
+    else if(op==p&&tokens[p].type==DER) return vaddr_read(eval(p+1,q),4);
     
   }
 return 0;
@@ -292,9 +291,7 @@ uint32_t expr(char *e, bool *success) {
     return 0;
   }
 
-  /* TODO: Insert codes to evaluate the expression. */
-  /* TODO: finish this after check_parenthese */
- // TODO();
+  
   int p=0, q=nr_token-1;
   return eval(p,q);
 }
