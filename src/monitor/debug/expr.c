@@ -190,6 +190,8 @@ static int eval(int p, int q)//TODO:to calculate the exper vals
     {
       return eval(p+1,q-1);
     }
+    else if(tokens[op].type==DER) return vaddr_read(eval(op+1,q),4);
+    else if(tokens[op].type==NEG) return -eval(op+1,q);
     int op_type = tokens[op].type;
     if(op_type==EQ) return l_eval==r_eval;
     else if(op_type==NEQ) return l_eval!=r_eval;
@@ -197,8 +199,6 @@ static int eval(int p, int q)//TODO:to calculate the exper vals
     else if(op_type==SUB) return l_eval-r_eval;
     else if(op_type==MUL) return l_eval*r_eval;
     else if(op_type==DIV) return l_eval/r_eval;
-    else if(op==p&&tokens[p].type==DER) return vaddr_read(eval(p+1,q),4);
-    
   }
 return 0;
 }
